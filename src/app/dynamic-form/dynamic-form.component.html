@@ -1,0 +1,118 @@
+<form [formGroup]="dynamicForm" class="p-4" [ngClass]="{'form-class': level != 0}">
+    <h6 *ngIf="level > 0" class="mb-3">JSON</h6>
+    <div class="row px-2">
+        <div class="col-sm-2">
+            <h6>Name</h6>
+        </div>
+        <div class="col-sm-4">
+            <h6>Value</h6>
+        </div>
+        <div class="col-sm-6">
+            <h6>Settings</h6>
+        </div>
+    </div>
+    <hr class="my-1">
+
+    <div formArrayName="group">
+        <div *ngFor="let item of dynamicForm.get('group').controls; let i = index">
+            <div class="row mb-2" [formGroup]="item">
+                <div class="col-sm-2">
+                    <input matInput formControlName="name" class="form-control " placeholder="Field Name">
+                    <div *ngIf="submitted && !item.get('name').valid" class="error-message">
+                        Name is Required
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="row">
+                        <div class="col-sm-5">
+                            <select formControlName="dataType" class="form-select" (change)="changeType($event, i)">
+                                <option>Select Datatype</option>
+                                <option value="string">STRING</option>
+                                <option value="number">NUMBER</option>
+                                <option value="boolean">BOOLEAN</option>
+                                <option value="json" *ngIf="level < 4">JSON</option>
+                            </select>
+                            <div *ngIf="submitted && !item.get('dataType').valid" class="error-message">
+                                Datatype is Required
+                            </div>
+                        </div>
+                        <div class="col-sm-7" *ngIf="item.get('dataType').value != 'json'">
+                            <input matInput formControlName="value" class="form-control" placeholder="Value">
+                            <div *ngIf="submitted && !item.get('value').valid" class="error-message">
+                                Value is Required
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-5" style="display: flex; align-items:center">
+                    <div class="row align-items-center" formGroupName="validators"
+                        *ngIf="item.get('dataType').value != 'json'">
+                        <div class="col-sm-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" formControlName="isMandatory"
+                                    id="flexCheckDefault{{level}}{{i}}">
+                                <label class="form-check-label" for="flexCheckDefault{{level}}{{i}}">
+                                    Mandatory
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-3" *ngIf="item.get('dataType').value != 'boolean'">
+                            <input matInput formControlName="minLength" type="number" class="form-control"
+                                placeholder="min length">
+                            <div *ngIf="submitted && !item.get('validators').get('minLength').valid" class="error-message">
+                                Min Length is Required
+                            </div>
+                        </div>
+                        <div class="col-sm-3" *ngIf="item.get('dataType').value != 'boolean'">
+                            <input matInput formControlName="maxLength" type="number" class="form-control"
+                                placeholder="max length">
+                            <div *ngIf="submitted && !item.get('validators').get('minLength').valid" class="error-message">
+                                Max Length is Required
+                            </div>
+                        </div>
+                        <div class="col-sm-3" *ngIf="item.get('dataType').value != 'boolean'">
+                            <input matInput formControlName="regex" type="text" class="form-control"
+                                placeholder="regex">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-1" style="display: flex; justify-content: end; align-items: center">
+                    <button type="button" class="btn" (click)="delete(i)"><img width="15" height="15"
+                            src="https://img.icons8.com/material-rounded/24/ff0000/filled-trash.png"
+                            alt="filled-trash" /></button>
+                </div>
+            </div>
+            <div>
+                <app-dynamic-form *ngIf="dynamicForm.get('group').controls[i].get('nestedFieldsBoolean').value"
+                    [level]="level + 1" (childGroupForm)="updateParentGroup($event, i)" [submitted]="submitted"></app-dynamic-form>
+            </div>
+        </div>
+    </div>
+
+    <br>
+    <button type="text" (click)="addFormRow()" class="btn add-button text-white"> + Add Field</button>
+    <br><br><br>
+    <div style="display: flex; justify-content: end">
+        <button type="text" (click)="submit()" *ngIf="level == 0" class="btn bg-success text-white">Show Output</button>
+    </div>
+
+</form>
+
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{'display':displayStyle}">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">JSON Output</h4>
+            </div>
+            <div class="modal-body">
+                <p>JSON is <b>{{dynamicForm.valid ? 'VALID' : 'NOT VALID'}}</b></p>
+                <ngx-json-viewer [json]="dynamicForm.value.group"></ngx-json-viewer>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" (click)="closePopup()">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,25 @@
+.form-class{
+    border: 1px solid #dbd5d5;
+    margin-top: 20px;
+}
+
+.add-button{
+    border: 1px solid black;
+    border-radius: 0;
+    color: black !important;
+}
+
+input, select{
+    border-radius: 0;
+    font-size: 13px;
+}
+
+.form-group.has-error {
+    color: #a94442;
+  }
+  
+  .error-message {
+    color: #a94442; 
+    font-size: 9px;
+    position: absolute;
+  }
